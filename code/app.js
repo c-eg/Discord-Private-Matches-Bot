@@ -1,13 +1,12 @@
-// requires
-const Discord = require("discord.js");
-const config = require("./config.json");
-
-const client = new Discord.Client();
-
+/**
+ * File          : app.js
+ * Last Modified : 14/09/2020
+ * Description   : Discord bot for private 6 person matches
+ * Author        : c-eg - Conor Egan
+ */
 
 /**
  * todo:
- *  - continue making the leave embedMessage
  *  - work how to link users to:
  *      - steam
  *      - xbox
@@ -18,15 +17,11 @@ const client = new Discord.Client();
  *
  */
 
+// requires
+const Discord = require("discord.js");
+const config = require("./config.json");
 
-
-
-
-
-
-
-
-
+const client = new Discord.Client();
 
 // set to store users in queue
 let users = new Set();
@@ -52,7 +47,8 @@ const embedMessageLeaveQueue = new Discord.MessageEmbed()
 const embedMessageQueueFull = new Discord.MessageEmbed()
     .setTitle('Private Matches!')
     .setColor("#b10000")
-    .addField("Queue Full!", "The queue is now full.");
+    .addField("Queue Full, Players in Queue: ", "filler")
+    .addField("Vote Method", "filler");
 
 const embedMessageMatchStarted = new Discord.MessageEmbed()
     .setTitle('Private Matches!')
@@ -79,46 +75,40 @@ client.on("message", function(message)
             // add user to set to keep track of who wants to play
             users.add(message.member.user);
 
-            // print users in queue
-            if (users.size > 1)
-            {
-                let inQueue = "";
-
-                // get users in queue and add to string to add to EmbedMessage
-                for (const item of users.values())
-                    inQueue += item.toString() + ' ';
-
-                // set EmbedMessage to the string
-                embedMessageJoinedQueue.fields[0].value = message.member.user.toString() + " joined the queue.";
-                embedMessageJoinedQueue.fields[1].name = "Users in Queue: " + users.size;
-                embedMessageJoinedQueue.fields[1].value = inQueue;
-
-                // send the message
-                client.channels.cache.get(message.channel.id).send(embedMessageJoinedQueue);
-            }
-            // say user started queue
-            else
+            // user starts the queue
+            if (users.size === 1)
             {
                 embedMessageStartedQueue.fields[0].value = message.member.user.toString() + " started the queue, type `!q` or `!queue` to join!"
 
                 // send the message
                 client.channels.cache.get(message.channel.id).send(embedMessageStartedQueue);
             }
+            // user joins the queue
+            else if (users.size > 1 && users.size < 6)
+            {
+                // set EmbedMessage to the string
+                embedMessageJoinedQueue.fields[0].value = message.member.user.toString() + " joined the queue.";
+                embedMessageJoinedQueue.fields[1].name = "Users in Queue: " + users.size;
+                embedMessageJoinedQueue.fields[1].value = getUsersInQueue();
+
+                // send the message
+                client.channels.cache.get(message.channel.id).send(embedMessageJoinedQueue);
+            }
+            // queue is full, vote on method to start match
+            else if (users.size === 6)
+            {
+                // vote to select method to choose teams
+            }
         }
         else if (command === "l" || command === "leave")
         {
             users.delete(message.member.user);
 
-            let inQueue = "";
-
             // if there's more than 1 user in the queue
             if (users.size > 0)
             {
-                for (const item of users.values())
-                    inQueue += item.toString() + ' ';
-
                 embedMessageLeaveQueue.fields[1].name = "Users in Queue: " + users.size;
-                embedMessageLeaveQueue.fields[1].value = inQueue;
+                embedMessageLeaveQueue.fields[1].value = getUsersInQueue();
             }
             else
             {
@@ -136,3 +126,13 @@ client.on("message", function(message)
 })
 
 client.login(config.BOT_TOKEN);
+
+function getUsersInQueue()
+{
+    let inQueue = "";
+
+    for (const item of users.values())
+        inQueue += item.toString() + ' ';
+
+    return inQueue;
+}
