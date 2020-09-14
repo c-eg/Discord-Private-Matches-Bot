@@ -7,13 +7,9 @@
 
 /**
  * todo:
- *  - work how to link users to:
- *      - steam
- *      - xbox
- *      - ps
- *  - store users in db
- *  - how to get mmr from linked account
- *  - store mmr in db
+ *  - !setpeak command should store the users peak mmr in db
+ *  - !help should list all commands
+ *  - Add commands for admins/mods to clear queue etc.
  *
  */
 
@@ -97,7 +93,11 @@ client.on("message", function(message)
             // queue is full, vote on method to start match
             else if (users.size === 6)
             {
-                // vote to select method to choose teams
+                // update users in queue
+                embedMessageQueueFull.fields[0].name = "Queue Full, Players in Queue: 6";
+                embedMessageQueueFull.fields[0].value = getUsersInQueue();
+
+                //
             }
         }
         else if (command === "l" || command === "leave")
@@ -121,6 +121,19 @@ client.on("message", function(message)
 
             // send the message
             client.channels.cache.get(message.channel.id).send(embedMessageLeaveQueue);
+        }
+        else if (command === "setpeak")
+        {
+            if (args.length === 1)
+            {
+                //client.channels.cache.get(message.channel.id).send("your mmr is: " + args[0]);
+
+                // set users mmr in db
+            }
+            else
+            {
+                // reply to user saying they should enter the command like: !setpeak <mmr>
+            }
         }
     }
 })
