@@ -1,3 +1,5 @@
 code/.idea/
 code/node_modules/
 code/config.json
+code/discord-bot.iml
+code/package-lock.json
