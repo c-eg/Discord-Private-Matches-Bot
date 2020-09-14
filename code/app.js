@@ -33,28 +33,32 @@ let users = new Set();
 
 // template for EmbedMessage when a user starts a queue
 const embedMessageStartedQueue = new Discord.MessageEmbed()
-    .setTitle('Private matches!')
+    .setTitle('Private Matches!')
     .setColor("#b10000")
     .addField("A queue has started!", "filler");
 
 const embedMessageJoinedQueue = new Discord.MessageEmbed()
-    .setTitle('Private matches!')
+    .setTitle('Private Matches!')
     .setColor("#b10000")
     .addField("User Joined!", "filler")
     .addField("Users in Queue: ", "filler");
 
 const embedMessageLeaveQueue = new Discord.MessageEmbed()
-    .setTitle('Private matches!')
+    .setTitle('Private Matches!')
     .setColor("#b10000")
     .addField("User Left the Queue", "filler")
-    .addField("Users in Queue: ", "filler")
+    .addField("Users in Queue: ", "filler");
 
-// const embedMessageLeaveQueueNoUsersLeft = new Discord.MessageEmbed()
-//     .setTitle('Private matches!')
-//     .setColor("#b10000")
-//     .addField("User Left the Queue", "filler")
-//     .addField("Users in Queue: ", "filler")
+const embedMessageQueueFull = new Discord.MessageEmbed()
+    .setTitle('Private Matches!')
+    .setColor("#b10000")
+    .addField("Queue Full!", "The queue is now full.");
 
+const embedMessageMatchStarted = new Discord.MessageEmbed()
+    .setTitle('Private Matches!')
+    .setColor("#b10000")
+    .addField("Team 1", "filler")
+    .addField("Team 2", "filler");
 
 client.on("message", function(message)
 {
@@ -112,17 +116,21 @@ client.on("message", function(message)
             {
                 for (const item of users.values())
                     inQueue += item.toString() + ' ';
+
+                embedMessageLeaveQueue.fields[1].name = "Users in Queue: " + users.size;
+                embedMessageLeaveQueue.fields[1].value = inQueue;
             }
             else
             {
-                inQueue = "No users in the queue.";
+                embedMessageLeaveQueue.fields[1].name = "Queue Empty";
+                embedMessageLeaveQueue.fields[1].value = "No users in the queue.";
             }
 
             // set EmbedMessage to the string
-            embedMessage.fields[0].value = inQueue;
+            embedMessageLeaveQueue.fields[0].value = message.member.user.toString() + " left the queue.";
 
             // send the message
-            client.channels.cache.get(message.channel.id).send(embedMessage);
+            client.channels.cache.get(message.channel.id).send(embedMessageLeaveQueue);
         }
     }
 })
