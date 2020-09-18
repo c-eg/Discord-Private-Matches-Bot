@@ -5,6 +5,15 @@
  * Author        : c-eg (Conor Egan)
  */
 
+const Discord = require('discord.js');
+let inQueue = require('../data/InQueue.js');
+
+const embedMessageLeaveQueue = new Discord.MessageEmbed()
+    .setTitle('Private Matches!')
+    .setColor("#b10000")
+    .addField("User Left the Queue", "filler")
+    .addField("Users in Queue: ", "filler");
+
 module.exports = {
     name: 'leave',
     description: 'Leaves the current queue.',
@@ -16,13 +25,13 @@ module.exports = {
 
     execute(message, args)
     {
-        users.delete(message.member.user);
+        inQueue.remove(message.member.user);
 
         // if there's more than 1 user in the queue
-        if (users.size > 0)
+        if (inQueue.users.size > 0)
         {
-            embedMessageLeaveQueue.fields[1].name = "Users in Queue: " + users.size;
-            embedMessageLeaveQueue.fields[1].value = getUsersInQueue();
+            embedMessageLeaveQueue.fields[1].name = "Users in Queue: " + inQueue.users.size;
+            embedMessageLeaveQueue.fields[1].value = inQueue.getUsersInQueue();
         }
         else
         {
@@ -34,6 +43,6 @@ module.exports = {
         embedMessageLeaveQueue.fields[0].value = message.member.user.toString() + " left the queue.";
 
         // send the message
-        discordClient.channels.cache.get(message.channel.id).send(embedMessageLeaveQueue);
+        message.channel.send(embedMessageLeaveQueue);
     },
 };

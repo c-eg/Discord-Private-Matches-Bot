@@ -7,11 +7,13 @@
 
 /**
  * todo:
- *  - currently up to command aliases!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
  *  - !setpeak command should store the users peak mmr in db
- *  - !help should list all commands
  *  - Add commands for admins/mods to clear queue etc.
- *
+ *  - Sort out permissions for each command
+ *  - Figure out how to set bot to single channel
+ *  - When user queues, make sure they have their mmr set
+ *  - Figure out message reactions to vote match team balance method
+ *  - Figure out how to balance teams based off their mmr in db
  */
 
 // requires
@@ -39,42 +41,16 @@ const cooldowns = new Discord.Collection();         // new map for cooldowns
 
 // log to console bot is ready
 discordClient.once('ready', () => {
-    console.log('Ready!');
+    console.log('curpha-bot is ready!');
 });
 
 
-// // set to store users in queue
-// let users = new Set();
-//
-// // template for EmbedMessage when a user starts a queue
-// const embedMessageStartedQueue = new Discord.MessageEmbed()
-//     .setTitle('Private Matches!')
-//     .setColor("#b10000")
-//     .addField("A queue has started!", "filler");
-//
-// const embedMessageJoinedQueue = new Discord.MessageEmbed()
-//     .setTitle('Private Matches!')
-//     .setColor("#b10000")
-//     .addField("User Joined!", "filler")
-//     .addField("Users in Queue: ", "filler");
-//
-// const embedMessageLeaveQueue = new Discord.MessageEmbed()
-//     .setTitle('Private Matches!')
-//     .setColor("#b10000")
-//     .addField("User Left the Queue", "filler")
-//     .addField("Users in Queue: ", "filler");
-//
-// const embedMessageQueueFull = new Discord.MessageEmbed()
-//     .setTitle('Private Matches!')
-//     .setColor("#b10000")
-//     .addField("Queue Full, Players in Queue: ", "filler")
-//     .addField("Vote Method", "filler");
-//
 // const embedMessageMatchStarted = new Discord.MessageEmbed()
 //     .setTitle('Private Matches!')
 //     .setColor("#b10000")
 //     .addField("Team 1", "filler")
 //     .addField("Team 2", "filler");
+
 
 discordClient.on("message", function(message)
 {

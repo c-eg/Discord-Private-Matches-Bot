@@ -15,18 +15,8 @@ module.exports = {
 
     execute(message, args)
     {
-        /**
-         * Change this as you don't need to check for args length anymore.
-         */
-        if (args.length === 1)
-        {
-            //client.channels.cache.get(message.channel.id).send("your mmr is: " + args[0]);
+        message.channel.send(`your mmr is: ${args[0]}`);
 
-            // set users mmr in db
-        }
-        else
-        {
-            // reply to user saying they should enter the command like: !setpeak <mmr>
-        }
+        // database stuff needs doing
     },
 };
