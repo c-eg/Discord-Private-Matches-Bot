@@ -1,12 +1,13 @@
 /**
  * File          : app.js
- * Last Modified : 14/09/2020
+ * Last Modified : 18/09/2020
  * Description   : Discord bot for private 6 person matches
- * Author        : c-eg - Conor Egan
+ * Author        : c-eg (Conor Egan)
  */
 
 /**
  * todo:
+ *  - currently up to command aliases!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
  *  - !setpeak command should store the users peak mmr in db
  *  - !help should list all commands
  *  - Add commands for admins/mods to clear queue etc.
@@ -14,138 +15,154 @@
  */
 
 // requires
-const Discord = require("discord.js");
-const config = require("./config.json");
+const fs = require('fs');                           // get node js file system
+const Discord = require("discord.js");              // get discord.js
+const config = require("./config.json");            // get config.json
 
-const client = new Discord.Client();
+const discordClient = new Discord.Client();         // discord client
+discordClient.commands = new Discord.Collection();  // new map for commands
 
-// set to store users in queue
-let users = new Set();
+const commandFiles = fs.readdirSync('./commands')
+    .filter(file => file.endsWith('.js'));          // read in command files
 
-// template for EmbedMessage when a user starts a queue
-const embedMessageStartedQueue = new Discord.MessageEmbed()
-    .setTitle('Private Matches!')
-    .setColor("#b10000")
-    .addField("A queue has started!", "filler");
+// loop through commands, adding them to the collection of commands
+for (const file of commandFiles)
+{
+    const command = require(`./commands/${file}`);
 
-const embedMessageJoinedQueue = new Discord.MessageEmbed()
-    .setTitle('Private Matches!')
-    .setColor("#b10000")
-    .addField("User Joined!", "filler")
-    .addField("Users in Queue: ", "filler");
+    // set a new item in the Collection
+    // with the key as the command name and the value as the exported module
+    discordClient.commands.set(command.name, command);
+}
 
-const embedMessageLeaveQueue = new Discord.MessageEmbed()
-    .setTitle('Private Matches!')
-    .setColor("#b10000")
-    .addField("User Left the Queue", "filler")
-    .addField("Users in Queue: ", "filler");
+const cooldowns = new Discord.Collection();         // new map for cooldowns
 
-const embedMessageQueueFull = new Discord.MessageEmbed()
-    .setTitle('Private Matches!')
-    .setColor("#b10000")
-    .addField("Queue Full, Players in Queue: ", "filler")
-    .addField("Vote Method", "filler");
+// log to console bot is ready
+client.once('ready', () => {
+    console.log('Ready!');
+});
 
-const embedMessageMatchStarted = new Discord.MessageEmbed()
-    .setTitle('Private Matches!')
-    .setColor("#b10000")
-    .addField("Team 1", "filler")
-    .addField("Team 2", "filler");
 
-client.on("message", function(message)
+// // set to store users in queue
+// let users = new Set();
+//
+// // template for EmbedMessage when a user starts a queue
+// const embedMessageStartedQueue = new Discord.MessageEmbed()
+//     .setTitle('Private Matches!')
+//     .setColor("#b10000")
+//     .addField("A queue has started!", "filler");
+//
+// const embedMessageJoinedQueue = new Discord.MessageEmbed()
+//     .setTitle('Private Matches!')
+//     .setColor("#b10000")
+//     .addField("User Joined!", "filler")
+//     .addField("Users in Queue: ", "filler");
+//
+// const embedMessageLeaveQueue = new Discord.MessageEmbed()
+//     .setTitle('Private Matches!')
+//     .setColor("#b10000")
+//     .addField("User Left the Queue", "filler")
+//     .addField("Users in Queue: ", "filler");
+//
+// const embedMessageQueueFull = new Discord.MessageEmbed()
+//     .setTitle('Private Matches!')
+//     .setColor("#b10000")
+//     .addField("Queue Full, Players in Queue: ", "filler")
+//     .addField("Vote Method", "filler");
+//
+// const embedMessageMatchStarted = new Discord.MessageEmbed()
+//     .setTitle('Private Matches!')
+//     .setColor("#b10000")
+//     .addField("Team 1", "filler")
+//     .addField("Team 2", "filler");
+
+discordClient.on("message", function(message)
 {
     // if bot or message doesn't start with prefix, do nothing
-    if (message.author.bot)
-        return;
-    else if (!message.content.startsWith(config.PREFIX))
+    if (message.author.bot || !message.content.startsWith(config.PREFIX))
         return;
     else
     {
-        // message contents
-        const args = message.content.slice(config.PREFIX.length).split(" ");
-        const command = args.shift().toLowerCase();
+        // get args and command name
+        const args = message.content.slice(config.PREFIX.length).trim().split(/ +/);
+        const commandName = args.shift().toLowerCase();
 
-        // joining queue
-        if (command === "q" || command === "queue")
+        // if the command isn't a commands, do nothing
+        if (!discordClient.commands.has(commandName))
+            return;
+
+        // get commands from collection
+        const command = discordClient.commands.get(commandName);
+
+        if (command.guildOnly && message.channel.type === "dm")
         {
-            // add user to set to keep track of who wants to play
-            users.add(message.member.user);
+            return message.reply("I can\'t execute that command inside a direct message.");
+        }
 
-            // user starts the queue
-            if (users.size === 1)
+        // if the command requires args and the correct args aren't supplied
+        if (command.args && !args.length)
+        {
+            let reply = "You didn't provide any arguments, ${message.author}!";
+
+            // if command file includes usage
+            if (command.usage)
             {
-                embedMessageStartedQueue.fields[0].value = message.member.user.toString() + " started the queue, type `!q` or `!queue` to join!"
-
-                // send the message
-                client.channels.cache.get(message.channel.id).send(embedMessageStartedQueue);
+                reply += "\nUsage: \'${config.PREFIX}${command.name} ${command.usage}\'";
             }
-            // user joins the queue
-            else if (users.size > 1 && users.size < 6)
-            {
-                // set EmbedMessage to the string
-                embedMessageJoinedQueue.fields[0].value = message.member.user.toString() + " joined the queue.";
-                embedMessageJoinedQueue.fields[1].name = "Users in Queue: " + users.size;
-                embedMessageJoinedQueue.fields[1].value = getUsersInQueue();
 
-                // send the message
-                client.channels.cache.get(message.channel.id).send(embedMessageJoinedQueue);
-            }
-            // queue is full, vote on method to start match
-            else if (users.size === 6)
-            {
-                // update users in queue
-                embedMessageQueueFull.fields[0].name = "Queue Full, Players in Queue: 6";
-                embedMessageQueueFull.fields[0].value = getUsersInQueue();
+            return message.channel.send(reply);
+        }
 
-                //
+        // check if the cooldowns collection has the command, if not add it
+        if (!cooldowns.has(command.name))
+        {
+            cooldowns.set(command.name, new Discord.Collection());
+        }
+
+        const now = Date.now();
+        const timeStamps = cooldowns.get(command.name);
+        const cooldownAmount = (command.cooldown) * 3000;
+
+        // if the timeStamp contains the author of the message already
+        if (timeStamps.has(message.author.id))
+        {
+            const expirationTime = timeStamps.get(message.author.id) + cooldownAmount;
+
+            // check the message is before the cooldown period
+            if (now < expirationTime)
+            {
+                const timeLeft = (expirationTime - now) / 1000;
+                return message.reply("Please wait ${timeLeft} more second(s) before reusing the \`${command.name}\` command.");
             }
         }
-        else if (command === "l" || command === "leave")
+
+        // add user to timeStamps mapped to when they sent it
+        timeStamps.set(message.author.id, now);
+
+        // delete entry in map after cooldown period has passed
+        setTimeout(() => timeStamps.delete(message.author.id), cooldownAmount);
+
+        // try executing the command
+        try
         {
-            users.delete(message.member.user);
-
-            // if there's more than 1 user in the queue
-            if (users.size > 0)
-            {
-                embedMessageLeaveQueue.fields[1].name = "Users in Queue: " + users.size;
-                embedMessageLeaveQueue.fields[1].value = getUsersInQueue();
-            }
-            else
-            {
-                embedMessageLeaveQueue.fields[1].name = "Queue Empty";
-                embedMessageLeaveQueue.fields[1].value = "No users in the queue.";
-            }
-
-            // set EmbedMessage to the string
-            embedMessageLeaveQueue.fields[0].value = message.member.user.toString() + " left the queue.";
-
-            // send the message
-            client.channels.cache.get(message.channel.id).send(embedMessageLeaveQueue);
+            command.execute(message, args);
         }
-        else if (command === "setpeak")
+        catch (error)
         {
-            if (args.length === 1)
-            {
-                //client.channels.cache.get(message.channel.id).send("your mmr is: " + args[0]);
-
-                // set users mmr in db
-            }
-            else
-            {
-                // reply to user saying they should enter the command like: !setpeak <mmr>
-            }
+            console.error(error);
+            message.reply("There was an error trying to execute that command...");
         }
     }
 })
 
-client.login(config.BOT_TOKEN);
+discordClient.login(config.BOT_TOKEN);
 
-function getUsersInQueue()
-{
-    let inQueue = "";
-
-    for (const item of users.values())
-        inQueue += item.toString() + ' ';
-
-    return inQueue;
-}
+// function getUsersInQueue()
+// {
+//     let inQueue = "";
+//
+//     for (const item of users.values())
+//         inQueue += item.toString() + ' ';
+//
+//     return inQueue;
+// }
