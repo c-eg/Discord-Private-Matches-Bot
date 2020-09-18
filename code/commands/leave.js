@@ -11,7 +11,8 @@ module.exports = {
     args: false,
     usage: '',
     guildOnly: true,
-    cooldown: 10,
+    cooldown: 2,
+    aliases: ['l'],
 
     execute(message, args)
     {

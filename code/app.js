@@ -38,7 +38,7 @@ for (const file of commandFiles)
 const cooldowns = new Discord.Collection();         // new map for cooldowns
 
 // log to console bot is ready
-client.once('ready', () => {
+discordClient.once('ready', () => {
     console.log('Ready!');
 });
 
@@ -87,13 +87,13 @@ discordClient.on("message", function(message)
         const args = message.content.slice(config.PREFIX.length).trim().split(/ +/);
         const commandName = args.shift().toLowerCase();
 
-        // if the command isn't a commands, do nothing
-        if (!discordClient.commands.has(commandName))
-            return;
+        // get commands from collection, including command aliases
+        const command = discordClient.commands.get(commandName)
+            || discordClient.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
 
-        // get commands from collection
-        const command = discordClient.commands.get(commandName);
+        if (!command) return;
 
+        // if command can only be used in a server, and it was sent in a DM
         if (command.guildOnly && message.channel.type === "dm")
         {
             return message.reply("I can\'t execute that command inside a direct message.");
@@ -102,12 +102,12 @@ discordClient.on("message", function(message)
         // if the command requires args and the correct args aren't supplied
         if (command.args && !args.length)
         {
-            let reply = "You didn't provide any arguments, ${message.author}!";
+            let reply = `You didn\'t provide any arguments, ${message.author}!`;
 
             // if command file includes usage
             if (command.usage)
             {
-                reply += "\nUsage: \'${config.PREFIX}${command.name} ${command.usage}\'";
+                reply += `\nUsage: \'${config.PREFIX}${command.name} ${command.usage}\'`;
             }
 
             return message.channel.send(reply);
@@ -121,7 +121,7 @@ discordClient.on("message", function(message)
 
         const now = Date.now();
         const timeStamps = cooldowns.get(command.name);
-        const cooldownAmount = (command.cooldown) * 3000;
+        const cooldownAmount = (command.cooldown || 1) * 3000;
 
         // if the timeStamp contains the author of the message already
         if (timeStamps.has(message.author.id))
@@ -132,7 +132,7 @@ discordClient.on("message", function(message)
             if (now < expirationTime)
             {
                 const timeLeft = (expirationTime - now) / 1000;
-                return message.reply("Please wait ${timeLeft} more second(s) before reusing the \`${command.name}\` command.");
+                return message.reply(`Please wait ${timeLeft} more second(s) before reusing the \`${command.name}\` command.`);
             }
         }
 

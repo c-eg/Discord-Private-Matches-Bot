@@ -9,7 +9,7 @@ module.exports = {
     name: 'setpeak',
     description: 'Sets your peak mmr for 3s to balance teams.',
     args: true,
-    usage: '<mmr>',
+    usage: '[mmr]',
     guildOnly: true,
     cooldown: 30,
 
