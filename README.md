@@ -1,5 +1,5 @@
 # Discord Private Matches Bot
-A bot to create private matches on a discord server.
+A bot to create private matches for Rocket League on a discord server.
 
 ## Project Status
 Currently under development.
@@ -11,7 +11,8 @@ Currently under development.
 1. Fork this repository, and clone it using "git clone"
 2. Create a bot on Discord
 3. Update config_template.json with your discord bot key and move & rename to code/config.json
-4. Run app.js
+4. Run "npm install"
+5. Run "node app.js"
 
 ## License
 GNU General Public License v3.0
