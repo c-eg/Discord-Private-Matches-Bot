@@ -1,4 +1,4 @@
-# Discord Private Matches Bot
+# Discord Rocket League Private Matches Bot
 A bot to create private matches for Rocket League on a discord server.
 
 ## Project Status
