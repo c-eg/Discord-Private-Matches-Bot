@@ -11,7 +11,7 @@ let InQueue = module.exports =
         },
         clear: function ()
         {
-            InQueue.clear();
+            InQueue.users.clear();
         },
         getUsersInQueue: function ()
         {
