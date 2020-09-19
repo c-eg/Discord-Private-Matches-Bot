@@ -1,19 +1,27 @@
 /**
  * File          : app.js
- * Last Modified : 18/09/2020
+ * Last Modified : 19/09/2020
  * Description   : Discord bot for private 6 person matches
  * Author        : c-eg (Conor Egan)
  */
 
 /**
- * todo:
+ * TODO:
  *  - !setpeak command should store the users peak mmr in db
- *  - Add commands for admins/mods to clear queue etc.
- *  - Sort out permissions for each command
- *  - Figure out how to set bot to single channel
+ *  - Message reactions to vote match team balance method
  *  - When user queues, make sure they have their mmr set
- *  - Figure out message reactions to vote match team balance method
- *  - Figure out how to balance teams based off their mmr in db
+ *  - Balance teams based off their mmr in db
+ *  - Permissions for each command, mainly !clear
+ *  - Set bot to single channel
+ *  - Replace all normal messages with EmbedMessages
+ *  - Host bot on server
+ *
+ *  Extra features:
+ *  TODO:
+ *   - Set bot display message
+ *   - Create own bot role
+ *   - Add multi-server support
+ *    - Each server must have their own queue
  */
 
 // requires
@@ -132,13 +140,3 @@ discordClient.on("message", function(message)
 })
 
 discordClient.login(config.BOT_TOKEN);
-
-// function getUsersInQueue()
-// {
-//     let inQueue = "";
-//
-//     for (const item of users.values())
-//         inQueue += item.toString() + ' ';
-//
-//     return inQueue;
-// }

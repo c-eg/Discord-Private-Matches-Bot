@@ -1,3 +1,11 @@
+/**
+ * File          : InQueue.js
+ * Last Modified : 19/09/2020
+ * Description   : Module to store users in queue, so other modules/files can
+ *                 also access and modify when needed
+ * Author        : c-eg (Conor Egan)
+ */
+
 let InQueue = module.exports =
     {
         users: new Set(),
