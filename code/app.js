@@ -1,19 +1,19 @@
 /**
  * File          : app.js
- * Last Modified : 19/09/2020
+ * Last Modified : 20/09/2020
  * Description   : Discord bot for private 6 person matches
  * Author        : c-eg (Conor Egan)
  */
 
 /**
  * TODO:
- *  - !setpeak command should store the users peak mmr in db
  *  - Message reactions to vote match team balance method
  *  - When user queues, make sure they have their mmr set
  *  - Balance teams based off their mmr in db
  *  - Permissions for each command, mainly !clear
  *  - Set bot to single channel
  *  - Replace all normal messages with EmbedMessages
+ *   - Add footer: Bot created by: c-eg
  *  - Host bot on server
  *
  *  Extra features:
@@ -84,9 +84,9 @@ discordClient.on("message", function(message)
         }
 
         // if the command requires args and the correct args aren't supplied
-        if (command.args && !args.length)
+        if (command.args && (args.length !== command.argsLength || !args.length))
         {
-            let reply = `You didn\'t provide any arguments, ${message.author}!`;
+            let reply = `You didn\'t provide the correct arguments, ${message.author}!`;
 
             // if command file includes usage
             if (command.usage)

@@ -2,3 +2,4 @@ code/.idea/
 code/node_modules/
 code/config.json
 code/discord-bot.iml
+code/data/users.db
