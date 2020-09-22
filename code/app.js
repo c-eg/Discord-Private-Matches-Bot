@@ -1,6 +1,6 @@
 /**
  * File          : app.js
- * Last Modified : 20/09/2020
+ * Last Modified : 21/09/2020
  * Description   : Discord bot for private 6 person matches
  * Author        : c-eg (Conor Egan)
  */
@@ -11,7 +11,7 @@
  *  - When user queues, make sure they have their mmr set
  *  - Balance teams based off their mmr in db
  *  - Permissions for each command, mainly !clear
- *  - Set bot to single channel
+ *  - Add option to queue for a time: !q 10 would queue for 10 mins
  *  - Replace all normal messages with EmbedMessages
  *   - Add footer: Bot created by: c-eg
  *  - Host bot on server
@@ -64,6 +64,8 @@ discordClient.on("message", function(message)
 {
     // if bot or message doesn't start with prefix, do nothing
     if (message.author.bot || !message.content.startsWith(config.PREFIX))
+        return;
+    else if (message.channel.name !== config.CHANNEL_NAME)
         return;
     else
     {

@@ -1,6 +1,6 @@
 /**
- * File          : setpeak.js
- * Last Modified : 20/09/2020
+ * File          : setPeak.js
+ * Last Modified : 21/09/2020
  * Description   : Command to set peak mmr in database
  * Author        : c-eg (Conor Egan)
  */
@@ -83,8 +83,12 @@ function getUser(discordID, callback)
             callback(err);
         }
 
-        db.close();
         callback(row);
+    });
+
+    db.close(() =>
+    {
+        console.log("db closed getUser.")
     });
 }
 
@@ -109,7 +113,10 @@ function createUser(discordID, mmr, callback)
         callback(mmr);
     });
 
-    db.close();
+    db.close(() =>
+    {
+        console.log("db closed createUser.")
+    });
 }
 
 /**
@@ -132,5 +139,8 @@ function updateUser(discordID, mmr, callback)
         callback(mmr);
     });
 
-    db.close();
+    db.close(() =>
+    {
+        console.log("db closed updateUser.")
+    });
 }

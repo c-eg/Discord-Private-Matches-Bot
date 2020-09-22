@@ -1,6 +1,6 @@
 /**
  * File          : clear.js
- * Last Modified : 19/09/2020
+ * Last Modified : 22/09/2020
  * Description   : Command to clear the queue
  * Author        : c-eg (Conor Egan)
  */
@@ -21,7 +21,7 @@ module.exports = {
     guildOnly: true,
     cooldown: 3,
 
-    execute(message, args)
+    execute(message)
     {
         if (inQueue.users.size > 0)
         {
