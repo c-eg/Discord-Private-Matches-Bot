@@ -1,6 +1,6 @@
 /**
  * File          : queue.js
- * Last Modified : 21/09/2020
+ * Last Modified : 23/09/2020
  * Description   : Command to join the queue
  * Author        : c-eg (Conor Egan)
  */
@@ -13,27 +13,31 @@ const sqlite3 = require('sqlite3').verbose();       // get sqlite3
 const embedMessageStartedQueue = new Discord.MessageEmbed()
     .setTitle('Private Matches!')
     .setColor("#b10000")
-    .addField("A queue has started!", "filler");
+    .addField("A queue has started!", "filler")
+    .setFooter("Bot created by: curpha (c-eg)", "https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/avatars/59/595a3684e667dc05e9d0d7e76efa8bb33b43a45f_full.jpg");
 
 const embedMessageJoinedQueue = new Discord.MessageEmbed()
     .setTitle('Private Matches!')
     .setColor("#b10000")
     .addField("User Joined!", "filler")
-    .addField("Users in Queue: ", "filler");
+    .addField("Users in Queue: ", "filler")
+    .setFooter("Bot created by: curpha (c-eg)", "https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/avatars/59/595a3684e667dc05e9d0d7e76efa8bb33b43a45f_full.jpg");
 
 const embedMessageQueueFull = new Discord.MessageEmbed()
-    .setTitle('Vote on match balancing method, 2 minutes remaining!')
+    .setTitle('Vote on Match Balancing Method, 2 Minutes Remaining!')
     .setColor("#b10000")
-    .addField("User's not voted:", "filler")
+    .addField("User's Not Voted:", "filler")
     .addField(":regional_indicator_b: Balanced (based of mmr)", "No votes.")
     .addField(":regional_indicator_c: Captains", "No votes.")
-    .addField(":regional_indicator_r: Random (completely random)", "No votes.");
+    .addField(":regional_indicator_r: Random (completely random)", "No votes.")
+    .setFooter("Bot created by: curpha (c-eg)", "https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/avatars/59/595a3684e667dc05e9d0d7e76efa8bb33b43a45f_full.jpg");
 
 const embedMessageTeams = new Discord.MessageEmbed()
     .setTitle("Match Created!")
     .setColor("#b10000")
     .addField("Team 1", "filler")
-    .addField("Team 2", "filler");
+    .addField("Team 2", "filler")
+    .setFooter("Bot created by: curpha (c-eg)", "https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/avatars/59/595a3684e667dc05e9d0d7e76efa8bb33b43a45f_full.jpg");
 
 module.exports = {
     name: 'queue',
@@ -41,7 +45,7 @@ module.exports = {
     args: false,
     usage: '',
     guildOnly: true,
-    cooldown: 0,
+    cooldown: 1,
     aliases: ['q'],
 
     execute(message)

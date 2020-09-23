@@ -1,6 +1,6 @@
 /**
  * File          : setPeak.js
- * Last Modified : 21/09/2020
+ * Last Modified : 23/09/2020
  * Description   : Command to set peak mmr in database
  * Author        : c-eg (Conor Egan)
  */
@@ -14,7 +14,7 @@ module.exports = {
     argsLength: 1,
     usage: '[mmr]',
     guildOnly: true,
-    cooldown: 0,
+    cooldown: 10,
 
     execute(message, args)
     {

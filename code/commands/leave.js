@@ -1,6 +1,6 @@
 /**
  * File          : leave.js
- * Last Modified : 18/09/2020
+ * Last Modified : 23/09/2020
  * Description   : Command to leave the queue
  * Author        : c-eg (Conor Egan)
  */
@@ -12,7 +12,8 @@ const embedMessageLeaveQueue = new Discord.MessageEmbed()
     .setTitle('Private Matches!')
     .setColor("#b10000")
     .addField("User Left the Queue", "filler")
-    .addField("Users in Queue: ", "filler");
+    .addField("Users in Queue: ", "filler")
+    .setFooter("Bot created by: curpha (c-eg)", "https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/avatars/59/595a3684e667dc05e9d0d7e76efa8bb33b43a45f_full.jpg");
 
 module.exports = {
     name: 'leave',
@@ -20,7 +21,7 @@ module.exports = {
     args: false,
     usage: '',
     guildOnly: true,
-    cooldown: 0,
+    cooldown: 1,
     aliases: ['l'],
 
     execute(message)

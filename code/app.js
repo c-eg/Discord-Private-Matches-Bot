@@ -1,20 +1,16 @@
 /**
  * File          : app.js
- * Last Modified : 21/09/2020
+ * Last Modified : 23/09/2020
  * Description   : Discord bot for private 6 person matches
  * Author        : c-eg (Conor Egan)
  */
 
 /**
  * TODO:
- *  - Permissions for each command, mainly !clear
- *  - Replace all normal messages with EmbedMessages
- *   - Add footer: Bot created by: c-eg
  *  - Host bot on server
  *
  *  Extra features:
  *  TODO:
- *   - Set bot display message
  *   - Create own bot role
  *   - Add multi-server support
  *    - Each server must have their own queue
@@ -46,16 +42,9 @@ const cooldowns = new Discord.Collection();         // new map for cooldowns
 
 // log to console bot is ready
 discordClient.once('ready', () => {
-    console.log('curpha-bot is ready!');
+    console.log('UEA 6 Mans bot is ready!');
+    discordClient.user.setActivity('Callum and Harry go at each other', { type: 'LISTENING' });
 });
-
-
-// const embedMessageMatchStarted = new Discord.MessageEmbed()
-//     .setTitle('Private Matches!')
-//     .setColor("#b10000")
-//     .addField("Team 1", "filler")
-//     .addField("Team 2", "filler");
-
 
 discordClient.on("message", function(message)
 {
@@ -102,9 +91,9 @@ discordClient.on("message", function(message)
             cooldowns.set(command.name, new Discord.Collection());
         }
 
-        const now = Date.now();
-        const timeStamps = cooldowns.get(command.name);
-        const cooldownAmount = (command.cooldown || 1) * 3000;
+        let now = Date.now();
+        let timeStamps = cooldowns.get(command.name);
+        let cooldownAmount = (command.cooldown || 1) * 3000;
 
         // if the timeStamp contains the author of the message already
         if (timeStamps.has(message.author.id))
@@ -114,7 +103,7 @@ discordClient.on("message", function(message)
             // check the message is before the cooldown period
             if (now < expirationTime)
             {
-                const timeLeft = (expirationTime - now) / 1000;
+                let timeLeft = (expirationTime - now) / 1000;
                 return message.reply(`Please wait ${timeLeft} more second(s) before reusing the \`${command.name}\` command.`);
             }
         }
