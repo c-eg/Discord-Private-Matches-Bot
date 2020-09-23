@@ -202,7 +202,7 @@ module.exports = {
                                                 msg.edit(newEmbed);
 
                                                 // if users 3 users vote for the same method
-                                                if (voteBalanced.length === 2 || voteCaptains.length === 2 || voteRandom.length === 2) // CHANGE CUNT
+                                                if (voteBalanced.length === 3 || voteCaptains.length === 3 || voteRandom.length === 3)
                                                 {
                                                     collector.stop();
                                                 }
@@ -219,15 +219,15 @@ module.exports = {
                                     {
                                         msg.reactions.removeAll();
 
-                                        if (voteBalanced.length === 2 || (voteBalanced.length === 2 && voteCaptains.length === 2 && voteRandom.length === 2))
+                                        if (voteBalanced.length === 3 || (voteBalanced.length === 2 && voteCaptains.length === 2 && voteRandom.length === 2))
                                         {
                                             balancedMethod(message);
                                         }
-                                        else if (voteCaptains.length === 2)
+                                        else if (voteCaptains.length === 3)
                                         {
                                             captainsMethod(message);
                                         }
-                                        else if (voteRandom.length === 2)
+                                        else if (voteRandom.length === 3)
                                         {
                                             randomMethod(message);
                                         }
