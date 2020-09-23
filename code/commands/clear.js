@@ -23,7 +23,7 @@ module.exports = {
 
     execute(message)
     {
-        if (inQueue.users.size > 0)
+        if (inQueue.users.length > 0)
         {
             inQueue.clear();
             message.channel.send(embedMessageQueueCleared);

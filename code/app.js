@@ -7,11 +7,7 @@
 
 /**
  * TODO:
- *  - Message reactions to vote match team balance method
- *  - When user queues, make sure they have their mmr set
- *  - Balance teams based off their mmr in db
  *  - Permissions for each command, mainly !clear
- *  - Add option to queue for a time: !q 10 would queue for 10 mins
  *  - Replace all normal messages with EmbedMessages
  *   - Add footer: Bot created by: c-eg
  *  - Host bot on server
@@ -22,6 +18,7 @@
  *   - Create own bot role
  *   - Add multi-server support
  *    - Each server must have their own queue
+ *   - Add option to queue for a time: !q 10 would queue for 10 mins
  */
 
 // requires

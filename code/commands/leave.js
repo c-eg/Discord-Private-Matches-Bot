@@ -20,29 +20,35 @@ module.exports = {
     args: false,
     usage: '',
     guildOnly: true,
-    cooldown: 2,
+    cooldown: 0,
     aliases: ['l'],
 
-    execute(message, args)
+    execute(message)
     {
-        inQueue.remove(message.member.user);
+        let user = {discordUser: message.member.user};
 
-        // if there's more than 1 user in the queue
-        if (inQueue.users.size > 0)
+        // remove user from queue
+        if (inQueue.isUserInQueue(user))
         {
-            embedMessageLeaveQueue.fields[1].name = "Users in Queue: " + inQueue.users.size;
-            embedMessageLeaveQueue.fields[1].value = inQueue.getUsersInQueue();
-        }
-        else
-        {
-            embedMessageLeaveQueue.fields[1].name = "Queue Empty";
-            embedMessageLeaveQueue.fields[1].value = "No users in the queue.";
-        }
+            inQueue.remove(user);
 
-        // set EmbedMessage to the string
-        embedMessageLeaveQueue.fields[0].value = message.member.user.toString() + " left the queue.";
+            // if there's more than 1 user in the queue
+            if (inQueue.users.size > 0)
+            {
+                embedMessageLeaveQueue.fields[1].name = "Users in Queue: " + inQueue.users.size;
+                embedMessageLeaveQueue.fields[1].value = inQueue.getUsersInQueue();
+            }
+            else
+            {
+                embedMessageLeaveQueue.fields[1].name = "Queue Empty";
+                embedMessageLeaveQueue.fields[1].value = "No users in the queue.";
+            }
 
-        // send the message
-        message.channel.send(embedMessageLeaveQueue);
+            // set EmbedMessage to the string
+            embedMessageLeaveQueue.fields[0].value = message.member.user.toString() + " left the queue.";
+
+            // send the message
+            message.channel.send(embedMessageLeaveQueue);
+        }
     },
 };

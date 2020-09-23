@@ -8,26 +8,52 @@
 
 let InQueue = module.exports =
     {
-        users: new Set(),
+        users: [],
         add: function (user)
         {
-            InQueue.users.add(user);
+            this.users.push(user);
         },
         remove: function (user)
         {
-            InQueue.users.delete(user);
+            for (let i = 0; i < this.users.length; i++)
+            {
+                if (this.users[i].discordUser.id === user.discordUser.id)
+                    this.users.splice(i, 1);
+            }
         },
         clear: function ()
         {
-            InQueue.users.clear();
+            InQueue.users.length = 0;
+        },
+        isUserInQueue: function (User)
+        {
+            for (let i = 0; i < this.users.length; i++)
+            {
+                if (this.users[i].discordUser.id === User.discordUser.id)
+                    return true;
+            }
+
+            return false;
+        },
+        isUserIdInQueue: function (user)
+        {
+            for (let i = 0; i < this.users.length; i++)
+            {
+                if (this.users[i].discordUser.id === user.id)
+                    return true;
+            }
+
+            return false;
         },
         getUsersInQueue: function ()
         {
             let inQueue = "";
 
-            for (const item of this.users.values())
-                inQueue += item.toString() + ' ';
+            this.users.forEach((item) =>
+            {
+                inQueue += item.discordUser.toString() + ' ';
+            });
 
             return inQueue;
         }
-    }
+    };
