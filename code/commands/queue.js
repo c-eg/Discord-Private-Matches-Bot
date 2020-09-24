@@ -1,6 +1,6 @@
 /**
  * File          : queue.js
- * Last Modified : 23/09/2020
+ * Last Modified : 24/09/2020
  * Description   : Command to join the queue
  * Author        : c-eg (Conor Egan)
  */
@@ -57,204 +57,204 @@ module.exports = {
 
     execute(message)
     {
-        getUser(message.member.user.id, function(response)
+        let messageUser = message.member.user;
+
+        if (inQueue.users.length !== 6)
         {
-            // user not in db
-            if (!response)
+            getUser(messageUser.id, function(response)
             {
-                message.reply(`You have not set your peak MMR, use: \`!h setpeak\` for help!`);
-                return;
-            }
-            else
-            {
-                let User = {discordUser: message.member.user, mmr: response.MMR};
-
-                if (inQueue.isUserInQueue(User))
+                // user not in db
+                if (!response)
                 {
-                    message.reply("you are already in the queue.");
+                    message.reply(`You have not set your peak MMR, use: \`!h setpeak\` for help!`);
                     return;
-                }
-
-                if (inQueue.users.length !== 6)
-                {
-                    // add user to set to keep track of who wants to play
-                    inQueue.add(User);
                 }
                 else
                 {
-                    message.reply("Please wait until the vote is finished.");
-                    return;
-                }
+                    let User = {discordUser: messageUser, mmr: response.MMR};
 
-                // user starts the queue
-                if (inQueue.users.length === 1)
-                {
-                    embedMessageStartedQueue.fields[0].value = message.member.user.toString() + " started the queue, type `!q` or `!queue` to join!"
-
-                    // send the message
-                    message.channel.send(embedMessageStartedQueue);
-                }
-                // user joins the queue
-                else if (inQueue.users.length > 1 && inQueue.users.length < 6)
-                {
-                    // set EmbedMessage to the string
-                    embedMessageJoinedQueue.fields[0].value = message.member.user.toString() + " joined the queue.";
-                    embedMessageJoinedQueue.fields[1].name = "Users in Queue: " + inQueue.users.length;
-                    embedMessageJoinedQueue.fields[1].value = inQueue.getUsersInQueue();
-
-                    // send the message
-                    message.channel.send(embedMessageJoinedQueue);
-                }
-                // queue is full, vote on method to start match
-                else if (inQueue.users.length === 6)
-                {
-                    // update users in queue
-                    embedMessageQueueFull.fields[0].name = "Queue Full, Players in Queue: 6";
-                    embedMessageQueueFull.fields[0].value = inQueue.getUsersInQueue();
-
-                    // start vote
-                    const filter = (reaction, user) =>
+                    if (inQueue.isUserInQueue(User))
                     {
-                        return ['🇧', '🇨', '🇷'].includes(reaction.emoji.name);
-                    };
-
-                    let noVote = [];
-                    let voteBalanced = [];
-                    let voteCaptains = [];
-                    let voteRandom = [];
-                    let usersVoted = [];
-
-                    // add users in queue to not voted
-                    for (let i = 0; i < inQueue.users.length; i++)
+                        message.reply("you are already in the queue.");
+                        return;
+                    }
+                    else
                     {
-                        noVote.push(inQueue.users[i].discordUser);
+                        // add user to set to keep track of who wants to play
+                        inQueue.add(User);
                     }
 
-                    embedMessageQueueFull.fields[0].value = noVote.join(' ');
+                    // user starts the queue
+                    if (inQueue.users.length === 1)
+                    {
+                        embedMessageStartedQueue.fields[0].value = messageUser.toString() + " started the queue, type `!q` or `!queue` to join!"
 
-                    // send embed
-                    message.channel.send(embedMessageQueueFull)
-                        .then((msg) =>
+                        // send the message
+                        message.channel.send(embedMessageStartedQueue);
+                    }
+                    // user joins the queue
+                    else if (inQueue.users.length > 1 && inQueue.users.length < 6)
+                    {
+                        // set EmbedMessage to the string
+                        embedMessageJoinedQueue.fields[0].value = messageUser.toString() + " joined the queue.";
+                        embedMessageJoinedQueue.fields[1].name = "Users in Queue: " + inQueue.users.length;
+                        embedMessageJoinedQueue.fields[1].value = inQueue.getUsersInQueue();
+
+                        // send the message
+                        message.channel.send(embedMessageJoinedQueue);
+                    }
+                    // queue is full, vote on method to start match
+                    else if (inQueue.users.length === 6)
+                    {
+                        // update users in queue
+                        embedMessageQueueFull.fields[0].name = "Queue Full, Players in Queue: 6";
+                        embedMessageQueueFull.fields[0].value = inQueue.getUsersInQueue();
+
+                        // start vote
+                        const filter = (reaction, user) =>
                         {
-                            // add reactions to allow users to vote
-                            msg.react("🇧")
-                                .then(() => msg.react("🇨"))
-                                .then(() => msg.react("🇷"))
-                                .catch((err) => console.error("Failed to react: " + err))
-                                .then(() =>
+                            return ['🇧', '🇨', '🇷'].includes(reaction.emoji.name) && user.id === messageUser.id;
+                        };
+
+                        let noVote = [];
+                        let voteBalanced = [];
+                        let voteCaptains = [];
+                        let voteRandom = [];
+                        let usersVoted = [];
+
+                        // add users in queue to not voted
+                        for (let i = 0; i < inQueue.users.length; i++)
+                        {
+                            noVote.push(inQueue.users[i].discordUser);
+                        }
+
+                        embedMessageQueueFull.fields[0].value = noVote.join(' ');
+
+                        // send embed
+                        message.channel.send(embedMessageQueueFull)
+                            .then((msg) =>
+                            {
+                                const collector = msg.createReactionCollector(filter, { time: 120000 });
+
+                                const newEmbed = new Discord.MessageEmbed(msg.embeds[0]);
+
+                                // add reactions to allow users to vote
+                                msg.react("🇧")
+                                    .then(() => msg.react("🇨"))
+                                    .then(() => msg.react("🇷"))
+                                    .catch((err) => console.error("Failed to react: " + err));
+
+                                // when user reacts
+                                collector.on('collect', (reaction, user) =>
                                 {
-                                    const collector = msg.createReactionCollector(filter, { time: 120000 });
+                                    let userVoted = false;
 
-                                    const newEmbed = new Discord.MessageEmbed(msg.embeds[0]);
-
-                                    // when user reacts
-                                    collector.on('collect', (reaction, user) =>
+                                    for (let i = 0; i < usersVoted.length; i++)
                                     {
-                                        // check user is in queue
-                                        if (!inQueue.isUserIdInQueue(user))
+                                        if (usersVoted[i].id === user.id)
+                                            userVoted = true;
+                                    }
+
+                                    if (!userVoted)
+                                    {
+                                        if (reaction.emoji.name === '🇧')
                                         {
-                                            msg.reactions.resolve(reaction).users.remove(user);
+                                            voteBalanced.push(user);
+                                            noVote = removeFromArray(noVote, user);
+                                        }
+                                        else if (reaction.emoji.name === '🇨')
+                                        {
+                                            voteCaptains.push(user);
+                                            noVote = removeFromArray(noVote, user);
+                                        }
+                                        else if (reaction.emoji.name === '🇷')
+                                        {
+                                            voteRandom.push(user);
+                                            noVote = removeFromArray(noVote, user);
                                         }
                                         else
                                         {
-                                            let userVoted = false;
-
-                                            for (let i = 0; i < usersVoted.length; i++)
-                                            {
-                                                if (usersVoted[i].id === user.id)
-                                                    userVoted = true;
-                                            }
-
-                                            if (!userVoted)
-                                            {
-                                                if (reaction.emoji.name === '🇧')
-                                                {
-                                                    voteBalanced.push(user);
-                                                    noVote = removeFromArray(noVote, user);
-                                                }
-                                                else if (reaction.emoji.name === '🇨')
-                                                {
-                                                    voteCaptains.push(user);
-                                                    noVote = removeFromArray(noVote, user);
-                                                }
-                                                else if (reaction.emoji.name === '🇷')
-                                                {
-                                                    voteRandom.push(user);
-                                                    noVote = removeFromArray(noVote, user);
-                                                }
-
-                                                usersVoted.push(user);
-
-                                                // remove user's reaction to keep it clean
-                                                msg.reactions.resolve(reaction).users.remove(user);
-
-                                                // change content of who voted
-                                                if (noVote.length > 0)
-                                                    newEmbed.fields[0].value = noVote.join(' ');
-                                                else
-                                                    newEmbed.fields[0].value = "No users.";
-
-                                                if (voteBalanced.length > 0)
-                                                    newEmbed.fields[1].value = voteBalanced.join(' ');
-                                                else
-                                                    newEmbed.fields[1].value = "No votes.";
-
-                                                if (voteCaptains.length > 0)
-                                                    newEmbed.fields[2].value = voteCaptains.join(' ');
-                                                else
-                                                    newEmbed.fields[2].value = "No votes.";
-
-                                                if (voteRandom.length > 0)
-                                                    newEmbed.fields[3].value = voteRandom.join(' ');
-                                                else
-                                                    newEmbed.fields[3].value = "No votes.";
-
-                                                msg.edit(newEmbed).then(() =>
-                                                {
-                                                    // if users 3 users vote for the same method
-                                                    if (voteBalanced.length === 3 || voteCaptains.length === 3 || voteRandom.length === 3)
-                                                    {
-                                                        collector.stop("voted");
-                                                    }
-                                                    // if the votes are split
-                                                    else if (voteBalanced.length === 2 && voteCaptains.length === 2 && voteRandom.length === 2)
-                                                    {
-                                                        collector.stop("voted");
-                                                    }
-                                                });
-                                            }
+                                            return;
                                         }
-                                    });
 
-                                    collector.on('end', collected =>
-                                    {
-                                        msg.reactions.removeAll()
-                                            .then(() =>
+                                        usersVoted.push(user);
+
+                                        // remove user's reaction to keep it clean
+                                        msg.reactions.resolve(reaction).users.remove(user);
+
+                                        // change content of who voted
+                                        if (noVote.length > 0)
+                                            newEmbed.fields[0].value = noVote.join(' ');
+                                        else
+                                            newEmbed.fields[0].value = "No users.";
+
+                                        if (voteBalanced.length > 0)
+                                            newEmbed.fields[1].value = voteBalanced.join(' ');
+                                        else
+                                            newEmbed.fields[1].value = "No votes.";
+
+                                        if (voteCaptains.length > 0)
+                                            newEmbed.fields[2].value = voteCaptains.join(' ');
+                                        else
+                                            newEmbed.fields[2].value = "No votes.";
+
+                                        if (voteRandom.length > 0)
+                                            newEmbed.fields[3].value = voteRandom.join(' ');
+                                        else
+                                            newEmbed.fields[3].value = "No votes.";
+
+                                        msg.edit(newEmbed).then(() =>
+                                        {
+                                            // if users 3 users vote for the same method
+                                            if (voteBalanced.length >= 3 || voteCaptains.length >= 3 || voteRandom.length >= 3)
                                             {
-                                                if (voteBalanced.length === 3 || (voteBalanced.length === 2 && voteCaptains.length === 2 && voteRandom.length === 2))
-                                                {
-                                                    balancedMethod(message);
-                                                }
-                                                else if (voteCaptains.length === 3)
-                                                {
-                                                    captainsMethod(message);
-                                                }
-                                                else if (voteRandom.length === 3)
-                                                {
-                                                    randomMethod(message);
-                                                }
-                                                else
-                                                {
-                                                    inQueue.clear();
-                                                    message.channel.send("2 mintues passed without enough votes, queue cancelled.");
-                                                }
-                                            });
-                                    });
+                                                collector.stop();
+                                            }
+                                            // if the votes are split
+                                            else if (voteBalanced.length === 2 && voteCaptains.length === 2 && voteRandom.length === 2)
+                                            {
+                                                collector.stop();
+                                            }
+                                        });
+                                    }
                                 });
-                        });
+
+                                collector.on('end', collected =>
+                                {
+                                    msg.reactions.removeAll()
+                                        .catch((err) =>
+                                        {
+                                            console.log(err);
+                                        });
+
+                                    if ((voteBalanced.length >= 3) || (voteBalanced.length === 2 && voteCaptains.length === 2 && voteRandom.length === 2))
+                                    {
+                                        balancedMethod(message);
+                                    }
+                                    else if (voteCaptains.length >= 3)
+                                    {
+                                        captainsMethod(message);
+                                    }
+                                    else if (voteRandom.length >= 3)
+                                    {
+                                        randomMethod(message);
+                                    }
+                                    else
+                                    {
+                                        inQueue.clear();
+                                        message.channel.send("2 mintues passed without enough votes, queue cancelled.");
+                                    }
+                                });
+                            });
+                    }
                 }
-            }
-        });
+            });
+        }
+        else
+        {
+            message.reply("Please wait until the vote is finished.");
+            return;
+        }
     },
 };
 
