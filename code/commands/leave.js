@@ -29,27 +29,34 @@ module.exports = {
         let user = {discordUser: message.member.user};
 
         // remove user from queue
-        if (inQueue.isUserInQueue(user) && inQueue.users.length !== 6)
+        if (inQueue.isUserInQueue(user))
         {
-            inQueue.remove(user);
-
-            // if there's more than 1 user in the queue
-            if (inQueue.users.length > 0)
+            if (inQueue.users.length !== 6)
             {
-                embedMessageLeaveQueue.fields[1].name = "Users in Queue: " + inQueue.users.length;
-                embedMessageLeaveQueue.fields[1].value = inQueue.getUsersInQueue();
+                inQueue.remove(user);
+
+                // if there's more than 1 user in the queue
+                if (inQueue.users.length > 0)
+                {
+                    embedMessageLeaveQueue.fields[1].name = "Users in Queue: " + inQueue.users.length;
+                    embedMessageLeaveQueue.fields[1].value = inQueue.getUsersInQueue();
+                }
+                else
+                {
+                    embedMessageLeaveQueue.fields[1].name = "Queue Empty";
+                    embedMessageLeaveQueue.fields[1].value = "No users in the queue.";
+                }
+
+                // set EmbedMessage to the string
+                embedMessageLeaveQueue.fields[0].value = message.member.user.toString() + " left the queue.";
+
+                // send the message
+                message.channel.send(embedMessageLeaveQueue);
             }
             else
             {
-                embedMessageLeaveQueue.fields[1].name = "Queue Empty";
-                embedMessageLeaveQueue.fields[1].value = "No users in the queue.";
+                message.reply("You cannot leave as you are in a game!")
             }
-
-            // set EmbedMessage to the string
-            embedMessageLeaveQueue.fields[0].value = message.member.user.toString() + " left the queue.";
-
-            // send the message
-            message.channel.send(embedMessageLeaveQueue);
         }
     },
 };

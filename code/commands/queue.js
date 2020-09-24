@@ -32,6 +32,13 @@ const embedMessageQueueFull = new Discord.MessageEmbed()
     .addField(":regional_indicator_r: Random (completely random)", "No votes.")
     .setFooter("Bot created by: curpha (c-eg)", "https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/avatars/59/595a3684e667dc05e9d0d7e76efa8bb33b43a45f_full.jpg");
 
+const embedMessageCaptains = new Discord.MessageEmbed()
+    .setTitle("Captains Selected!")
+    .setColor("#b10000")
+    .addField("Team 1 Captain", "filler")
+    .addField("Team 2 Captain", "filler")
+    .setFooter("Bot created by: curpha (c-eg)", "https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/avatars/59/595a3684e667dc05e9d0d7e76efa8bb33b43a45f_full.jpg");
+
 const embedMessageTeams = new Discord.MessageEmbed()
     .setTitle("Match Created!")
     .setColor("#b10000")
@@ -242,7 +249,7 @@ module.exports = {
                                                     message.channel.send("2 mintues passed without enough votes, queue cancelled.");
                                                 }
                                             });
-                                    })
+                                    });
                                 });
                         });
                 }
@@ -285,6 +292,12 @@ function captainsMethod(messageFirst)
 
     teamOne.push(inQueue.users[0].discordUser);
     teamTwo.push(inQueue.users[1].discordUser);
+
+    // send message so users know captains are selecting teams
+    embedMessageCaptains.fields[0].value = teamOne[0].toString();
+    embedMessageCaptains.fields[1].value = teamTwo[0].toString();
+
+    messageFirst.channel.send(embedMessageCaptains);
 
     let msg = "Please pick a player to be on your team, type the number corresponding to the player e.g. `2`\n";
 
@@ -386,7 +399,7 @@ function captainsMethod(messageFirst)
                                         a += i + 1 + ") " + notInTeam[i].discordUser.toString() + "\n";
                                     }
 
-                                    firstPick.send(a)
+                                    secondPick.send(a)
                                         .then((message) =>
                                         {
                                             // get first picks choice 2
@@ -404,15 +417,15 @@ function captainsMethod(messageFirst)
                                                         i = 2;
                                                     }
 
-                                                    if (firstPick === teamOne[0])
-                                                    {
-                                                        teamOne.push(notInTeam.splice(i - 1, 1)[0].discordUser);
-                                                        teamTwo.push(notInTeam.shift().discordUser);
-                                                    }
-                                                    else
+                                                    if (secondPick === teamOne[0])
                                                     {
                                                         teamTwo.push(notInTeam.splice(i - 1, 1)[0].discordUser);
                                                         teamOne.push(notInTeam.shift().discordUser);
+                                                    }
+                                                    else
+                                                    {
+                                                        teamOne.push(notInTeam.splice(i - 1, 1)[0].discordUser);
+                                                        teamTwo.push(notInTeam.shift().discordUser);
                                                     }
                                                 })
                                                 .then(() =>
