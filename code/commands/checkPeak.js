@@ -34,7 +34,7 @@ module.exports = {
         }
         else
         {
-            getUser(args[0].id, function(response)
+            getUser(args[0].slice(3, -1), function(response)
             {
                 if (!response)
                 {
