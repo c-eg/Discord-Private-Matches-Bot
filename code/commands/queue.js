@@ -79,7 +79,6 @@ module.exports = {
                     return;
                 }
 
-
                 // user starts the queue
                 if (inQueue.users.length === 1)
                 {
@@ -203,42 +202,46 @@ module.exports = {
                                                 else
                                                     newEmbed.fields[3].value = "No votes.";
 
-                                                msg.edit(newEmbed);
-
-                                                // if users 3 users vote for the same method
-                                                if (voteBalanced.length === 3 || voteCaptains.length === 3 || voteRandom.length === 3)
+                                                msg.edit(newEmbed).then(() =>
                                                 {
-                                                    collector.stop();
-                                                }
-                                                // if the votes are split
-                                                else if (voteBalanced.length === 2 && voteCaptains.length === 2 && voteRandom.length === 2)
-                                                {
-                                                    collector.stop();
-                                                }
+                                                    // if users 3 users vote for the same method
+                                                    if (voteBalanced.length === 3 || voteCaptains.length === 3 || voteRandom.length === 3)
+                                                    {
+                                                        collector.stop("voted");
+                                                    }
+                                                    // if the votes are split
+                                                    else if (voteBalanced.length === 2 && voteCaptains.length === 2 && voteRandom.length === 2)
+                                                    {
+                                                        collector.stop("voted");
+                                                    }
+                                                });
                                             }
                                         }
                                     });
 
                                     collector.on('end', collected =>
                                     {
-                                        msg.reactions.removeAll();
-
-                                        if (voteBalanced.length === 3 || (voteBalanced.length === 2 && voteCaptains.length === 2 && voteRandom.length === 2))
-                                        {
-                                            balancedMethod(message);
-                                        }
-                                        else if (voteCaptains.length === 3)
-                                        {
-                                            captainsMethod(message);
-                                        }
-                                        else if (voteRandom.length === 3)
-                                        {
-                                            randomMethod(message);
-                                        }
-                                        else
-                                        {
-                                            message.channel.send("2 mintues passed without enough votes, queue cancelled.");
-                                        }
+                                        msg.reactions.removeAll()
+                                            .then(() =>
+                                            {
+                                                if (voteBalanced.length === 3 || (voteBalanced.length === 2 && voteCaptains.length === 2 && voteRandom.length === 2))
+                                                {
+                                                    balancedMethod(message);
+                                                }
+                                                else if (voteCaptains.length === 3)
+                                                {
+                                                    captainsMethod(message);
+                                                }
+                                                else if (voteRandom.length === 3)
+                                                {
+                                                    randomMethod(message);
+                                                }
+                                                else
+                                                {
+                                                    inQueue.clear();
+                                                    message.channel.send("2 mintues passed without enough votes, queue cancelled.");
+                                                }
+                                            });
                                     })
                                 });
                         });
@@ -265,8 +268,11 @@ function balancedMethod(message)
     embedMessageTeams.fields[0].value = teamOne.join(' ');
     embedMessageTeams.fields[1].value = teamTwo.join(' ');
 
-    message.channel.send(embedMessageTeams);
-    inQueue.clear();
+    message.channel.send(embedMessageTeams)
+        .then(() =>
+        {
+            inQueue.clear();
+        });
 }
 
 function captainsMethod(messageFirst)
@@ -414,8 +420,11 @@ function captainsMethod(messageFirst)
                                                     embedMessageTeams.fields[0].value = teamOne.join(' ');
                                                     embedMessageTeams.fields[1].value = teamTwo.join(' ');
 
-                                                    messageFirst.channel.send(embedMessageTeams);
-                                                    inQueue.clear();
+                                                    messageFirst.channel.send(embedMessageTeams)
+                                                    .then(() =>
+                                                    {
+                                                        inQueue.clear();
+                                                    });
                                                 });
                                         });
                                 });
@@ -440,8 +449,11 @@ function randomMethod(message)
     embedMessageTeams.fields[0].value = teamOne.join(' ');
     embedMessageTeams.fields[1].value = teamTwo.join(' ');
 
-    message.channel.send(embedMessageTeams);
-    inQueue.clear();
+    message.channel.send(embedMessageTeams)
+        .then(() =>
+        {
+            inQueue.clear();
+        });
 }
 
 /**

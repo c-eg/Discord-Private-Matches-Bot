@@ -7,7 +7,9 @@
 
 /**
  * TODO:
- *  - Host bot on server
+ *  - check mmr command
+ *   - !peak <user>, would sho
+ *  - add timeout command
  *
  *  Extra features:
  *  TODO:

@@ -29,14 +29,14 @@ module.exports = {
         let user = {discordUser: message.member.user};
 
         // remove user from queue
-        if (inQueue.isUserInQueue(user))
+        if (inQueue.isUserInQueue(user) && inQueue.users.length !== 6)
         {
             inQueue.remove(user);
 
             // if there's more than 1 user in the queue
-            if (inQueue.users.size > 0)
+            if (inQueue.users.length > 0)
             {
-                embedMessageLeaveQueue.fields[1].name = "Users in Queue: " + inQueue.users.size;
+                embedMessageLeaveQueue.fields[1].name = "Users in Queue: " + inQueue.users.length;
                 embedMessageLeaveQueue.fields[1].value = inQueue.getUsersInQueue();
             }
             else
