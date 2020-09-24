@@ -1,6 +1,6 @@
 /**
  * File          : list.js
- * Last Modified : 23/09/2020
+ * Last Modified : 24/09/2020
  * Description   : Command to list all users in queue
  * Author        : c-eg (Conor Egan)
  */
@@ -24,8 +24,16 @@ module.exports = {
 
     execute(message)
     {
-        embedMessageUsersInQueue.fields[0].name = "Users in Queue: " + inQueue.users.length;
-        embedMessageUsersInQueue.fields[0].value = inQueue.getUsersInQueue();
+        if (inQueue.users.length > 0)
+        {
+            embedMessageUsersInQueue.fields[0].name = "Users in Queue: " + inQueue.users.length;
+            embedMessageUsersInQueue.fields[0].value = inQueue.getUsersInQueue();
+        }
+        else
+        {
+            embedMessageUsersInQueue.fields[0].name = "Queue Empty";
+            embedMessageUsersInQueue.fields[0].value = "No users in the queue.";
+        }
 
         message.channel.send(embedMessageUsersInQueue);
     },

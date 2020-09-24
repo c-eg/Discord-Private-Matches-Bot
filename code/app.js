@@ -45,7 +45,7 @@ const cooldowns = new Discord.Collection();         // new map for cooldowns
 // log to console bot is ready
 discordClient.once('ready', () => {
     console.log('UEA 6 Mans bot is ready!');
-    discordClient.user.setActivity('Callum and Harry go at each other', { type: 'LISTENING' });
+    discordClient.user.setActivity('Callum and Harry shout at each other', { type: 'LISTENING' });
 });
 
 discordClient.on("message", function(message)
