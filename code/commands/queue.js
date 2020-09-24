@@ -66,7 +66,7 @@ module.exports = {
                 // user not in db
                 if (!response)
                 {
-                    message.reply(`You have not set your peak MMR, use: \`!h setpeak\` for help!`);
+                    message.reply(`You have not set your peak MMR, use: \`!setpeak [mmr]\`, e.g. \`!setpeak 1000\``);
                     return;
                 }
                 else
