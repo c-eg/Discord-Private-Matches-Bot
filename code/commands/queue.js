@@ -23,15 +23,6 @@ const embedMessageJoinedQueue = new Discord.MessageEmbed()
     .addField("Users in Queue: ", "filler")
     .setFooter("Bot created by: curpha (c-eg)", "https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/avatars/59/595a3684e667dc05e9d0d7e76efa8bb33b43a45f_full.jpg");
 
-const embedMessageQueueFull = new Discord.MessageEmbed()
-    .setTitle('Vote on Match Balancing Method, 2 Minutes Remaining!')
-    .setColor("#b10000")
-    .addField("User's Not Voted:", "filler")
-    .addField(":regional_indicator_b: Balanced (based of mmr)", "No votes.")
-    .addField(":regional_indicator_c: Captains", "No votes.")
-    .addField(":regional_indicator_r: Random (completely random)", "No votes.")
-    .setFooter("Bot created by: curpha (c-eg)", "https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/avatars/59/595a3684e667dc05e9d0d7e76efa8bb33b43a45f_full.jpg");
-
 const embedMessageCaptains = new Discord.MessageEmbed()
     .setTitle("Captains Selected!")
     .setColor("#b10000")
@@ -106,145 +97,79 @@ module.exports = {
                     // queue is full, vote on method to start match
                     else if (inQueue.users.length === 6)
                     {
-                        // update users in queue
-                        embedMessageQueueFull.fields[0].name = "Queue Full, Players in Queue: 6";
-                        embedMessageQueueFull.fields[0].value = inQueue.getUsersInQueue();
-
-                        // start vote
-                        const filter = (reaction, user) =>
-                        {
-                            return ['🇧', '🇨', '🇷'].includes(reaction.emoji.name) && user.id === messageUser.id;
-                        };
-
-                        let noVote = [];
-                        let voteBalanced = [];
-                        let voteCaptains = [];
-                        let voteRandom = [];
-                        let usersVoted = [];
-
-                        // add users in queue to not voted
-                        for (let i = 0; i < inQueue.users.length; i++)
-                        {
-                            noVote.push(inQueue.users[i].discordUser);
-                        }
-
-                        embedMessageQueueFull.fields[0].value = noVote.join(' ');
-
-                        // send embed
-                        message.channel.send(embedMessageQueueFull)
-                            .then((msg) =>
+                        message.channel.send(inQueue.getUsersInQueue())
+                            .then(() =>
                             {
-                                const collector = msg.createReactionCollector(filter, { time: 120000 });
-
-                                const newEmbed = new Discord.MessageEmbed(msg.embeds[0]);
-
-                                // add reactions to allow users to vote
-                                msg.react("🇧")
-                                    .then(() => msg.react("🇨"))
-                                    .then(() => msg.react("🇷"))
-                                    .catch((err) => console.error("Failed to react: " + err));
-
-                                // when user reacts
-                                collector.on('collect', (reaction, user) =>
-                                {
-                                    let userVoted = false;
-
-                                    for (let i = 0; i < usersVoted.length; i++)
+                                message.channel.send(`Please vote on the team balancing method! (2 minutes to vote)\n\nType:  \`!b\`  for balanced teams\nType:  \`!c\`  for team captains\nType:  \`!r\`  for random teams\n`)
+                                    .then(() =>
                                     {
-                                        if (usersVoted[i].id === user.id)
-                                            userVoted = true;
-                                    }
+                                        /*
+                                         *  Start vote
+                                         */
+                                        let voteBalanced = 0;
+                                        let voteCaptains = 0;
+                                        let voteRandom = 0;
+                                        let usersVoting = [];
 
-                                    if (!userVoted)
-                                    {
-                                        if (reaction.emoji.name === '🇧')
+                                        for (let i = 0; i < inQueue.users.length; i++)
                                         {
-                                            voteBalanced.push(user);
-                                            noVote = removeFromArray(noVote, user);
-                                        }
-                                        else if (reaction.emoji.name === '🇨')
-                                        {
-                                            voteCaptains.push(user);
-                                            noVote = removeFromArray(noVote, user);
-                                        }
-                                        else if (reaction.emoji.name === '🇷')
-                                        {
-                                            voteRandom.push(user);
-                                            noVote = removeFromArray(noVote, user);
-                                        }
-                                        else
-                                        {
-                                            return;
+                                            usersVoting.push(inQueue.users[i]);
                                         }
 
-                                        usersVoted.push(user);
+                                        const conditions = ['!b', '!c', '!r'];
 
-                                        // remove user's reaction to keep it clean
-                                        msg.reactions.resolve(reaction).users.remove(user);
+                                        // user is in queue and message is either: 'b', 'c' or 'r'
+                                        const filter = m => conditions.some(element => m.content === element.toString())
+                                            && usersVoting.some(user => user.discordUser.id === message.author.id);
 
-                                        // change content of who voted
-                                        if (noVote.length > 0)
-                                            newEmbed.fields[0].value = noVote.join(' ');
-                                        else
-                                            newEmbed.fields[0].value = "No users.";
+                                        const collector = message.channel.createMessageCollector(filter, { time: 120000 });
 
-                                        if (voteBalanced.length > 0)
-                                            newEmbed.fields[1].value = voteBalanced.join(' ');
-                                        else
-                                            newEmbed.fields[1].value = "No votes.";
-
-                                        if (voteCaptains.length > 0)
-                                            newEmbed.fields[2].value = voteCaptains.join(' ');
-                                        else
-                                            newEmbed.fields[2].value = "No votes.";
-
-                                        if (voteRandom.length > 0)
-                                            newEmbed.fields[3].value = voteRandom.join(' ');
-                                        else
-                                            newEmbed.fields[3].value = "No votes.";
-
-                                        msg.edit(newEmbed).then(() =>
+                                        collector.on('collect', m =>
                                         {
-                                            // if users 3 users vote for the same method
-                                            if (voteBalanced.length >= 3 || voteCaptains.length >= 3 || voteRandom.length >= 3)
+                                            switch (m.content)
+                                            {
+                                                case '!b':
+                                                    voteBalanced++;
+                                                    break;
+                                                case '!c':
+                                                    voteCaptains++;
+                                                    break;
+                                                case '!r':
+                                                    voteRandom++;
+                                                    break;
+                                            }
+
+                                            // remove user from voting
+                                            usersVoting = usersVoting.filter((el) =>
+                                            {
+                                                return el.discordUser.id !== message.author.id;
+                                            });
+
+                                            if (voteBalanced >= 3 || voteCaptains >= 3 || voteRandom >= 3)
                                             {
                                                 collector.stop();
                                             }
-                                            // if the votes are split
-                                            else if (voteBalanced.length === 2 && voteCaptains.length === 2 && voteRandom.length === 2)
+                                            else if (voteBalanced === 2 && voteCaptains === 2 && voteRandom === 2)
                                             {
                                                 collector.stop();
                                             }
                                         });
-                                    }
-                                });
 
-                                collector.on('end', collected =>
-                                {
-                                    msg.reactions.removeAll()
-                                        .catch((err) =>
+                                        collector.on('end', () =>
                                         {
-                                            console.log(err);
+                                            if ((voteBalanced >= 3) || voteBalanced === 2 && voteCaptains === 2 && voteRandom === 2)
+                                                balancedMethod(message);
+                                            else if (voteCaptains >= 3)
+                                                balancedMethod(message);
+                                            else if (voteRandom >= 3)
+                                                balancedMethod(message);
+                                            else
+                                            {
+                                                inQueue.clear();
+                                                message.channel.send("Queue cancelled because not enough people voted!");
+                                            }
                                         });
-
-                                    if ((voteBalanced.length >= 3) || (voteBalanced.length === 2 && voteCaptains.length === 2 && voteRandom.length === 2))
-                                    {
-                                        balancedMethod(message);
-                                    }
-                                    else if (voteCaptains.length >= 3)
-                                    {
-                                        captainsMethod(message);
-                                    }
-                                    else if (voteRandom.length >= 3)
-                                    {
-                                        randomMethod(message);
-                                    }
-                                    else
-                                    {
-                                        inQueue.clear();
-                                        message.channel.send("2 mintues passed without enough votes, queue cancelled.");
-                                    }
-                                });
+                                    });
                             });
                     }
                 }
