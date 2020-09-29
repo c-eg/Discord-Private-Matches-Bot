@@ -16,8 +16,8 @@ Out now! Not currently under development.
 ## How to setup project locally
 1. Fork this repository, and clone it using "git clone"
 2. Create a bot on Discord
-3. Update config_template.json with your discord bot key and move & rename to code/config.json
-4. Run "npm install"
+3. Update config_template.json and move & rename to code/config.json
+4. Navigate to project folder, then run "npm install"
 5. Run "node app.js"
 
 ## License
