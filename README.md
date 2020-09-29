@@ -2,7 +2,7 @@
 A bot to create private matches for Rocket League on a discord server.
 
 ## Project Status
-Out now! Not currently under development.
+Out now! Not currently under development. Currently used on the UEA Rocket League discord server.
 
 ## Usage
 - `!setpeak <mmr>` to set your highest mmr
