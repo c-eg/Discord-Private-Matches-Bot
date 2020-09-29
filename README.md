@@ -2,13 +2,16 @@
 A bot to create private matches for Rocket League on a discord server.
 
 ## Project Status
-Out now!
+Out now! Not currently under development.
 
 ## Usage
 - `!setpeak <mmr>` to set your highest mmr
+- `!checkpeak [user]` to check your mmr, or the user passed
 - `!queue` to join or start a queue
 - `!leave` to leave a queue
-- `!help [command]` to get a list of all commands and usage
+- `!clear` to clear the queue
+- `!list` to list who is in the queue
+- `!help [command]` to get a list of all commands and usage, or on a command passed
 
 ## How to setup project locally
 1. Fork this repository, and clone it using "git clone"
