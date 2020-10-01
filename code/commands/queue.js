@@ -119,40 +119,42 @@ module.exports = {
                                         const conditions = ['!b', '!c', '!r'];
 
                                         // user is in queue and message is either: 'b', 'c' or 'r'
-                                        const filter = m => conditions.some(element => m.content === element.toString())
-                                            && usersVoting.some(user => user.discordUser.id === message.author.id);
+                                        const filter = m => conditions.some(element => m.content === element.toString());
 
                                         const collector = message.channel.createMessageCollector(filter, { time: 120000 });
 
                                         collector.on('collect', m =>
                                         {
-                                            switch (m.content)
-                                            {
-                                                case '!b':
-                                                    voteBalanced++;
-                                                    break;
-                                                case '!c':
-                                                    voteCaptains++;
-                                                    break;
-                                                case '!r':
-                                                    voteRandom++;
-                                                    break;
-                                            }
+											if (usersVoting.some(user => user.discordUser.id === m.author.id))
+											{										
+												switch (m.content)
+												{
+													case '!b':
+														voteBalanced++;
+														break;
+													case '!c':
+														voteCaptains++;
+														break;
+													case '!r':
+														voteRandom++;
+														break;
+												}
 
-                                            // remove user from voting
-                                            usersVoting = usersVoting.filter((el) =>
-                                            {
-                                                return el.discordUser.id !== message.author.id;
-                                            });
+												// remove user from voting
+												usersVoting = usersVoting.filter((el) =>
+												{
+													return el.discordUser.id !== m.author.id;
+												});
 
-                                            if (voteBalanced >= 3 || voteCaptains >= 3 || voteRandom >= 3)
-                                            {
-                                                collector.stop();
-                                            }
-                                            else if (voteBalanced === 2 && voteCaptains === 2 && voteRandom === 2)
-                                            {
-                                                collector.stop();
-                                            }
+												if (voteBalanced >= 3 || voteCaptains >= 3 || voteRandom >= 3)
+												{
+													collector.stop();
+												}
+												else if (voteBalanced === 2 && voteCaptains === 2 && voteRandom === 2)
+												{
+													collector.stop();
+												}
+											}											
                                         });
 
                                         collector.on('end', () =>
@@ -160,9 +162,9 @@ module.exports = {
                                             if ((voteBalanced >= 3) || voteBalanced === 2 && voteCaptains === 2 && voteRandom === 2)
                                                 balancedMethod(message);
                                             else if (voteCaptains >= 3)
-                                                balancedMethod(message);
+                                                captainsMethod(message);
                                             else if (voteRandom >= 3)
-                                                balancedMethod(message);
+                                                randomMethod(message);
                                             else
                                             {
                                                 inQueue.clear();
