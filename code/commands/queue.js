@@ -346,13 +346,13 @@ function captainsMethod(messageFirst)
 
                                                     if (secondPick === teamOne[0])
                                                     {
-                                                        teamTwo.push(notInTeam.splice(i - 1, 1)[0].discordUser);
-                                                        teamOne.push(notInTeam.shift().discordUser);
+                                                        teamOne.push(notInTeam.splice(i - 1, 1)[0].discordUser);
+                                                        teamTwo.push(notInTeam.shift().discordUser);
                                                     }
                                                     else
                                                     {
-                                                        teamOne.push(notInTeam.splice(i - 1, 1)[0].discordUser);
-                                                        teamTwo.push(notInTeam.shift().discordUser);
+                                                        teamTwo.push(notInTeam.splice(i - 1, 1)[0].discordUser);
+                                                        teamOne.push(notInTeam.shift().discordUser);
                                                     }
                                                 })
                                                 .then(() =>
