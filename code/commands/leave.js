@@ -13,7 +13,7 @@ const embedMessageLeaveQueue = new Discord.MessageEmbed()
     .setColor("#b10000")
     .addField("User Left the Queue", "filler")
     .addField("Users in Queue: ", "filler")
-    .setFooter("Bot created by: curpha (c-eg)", "https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/avatars/59/595a3684e667dc05e9d0d7e76efa8bb33b43a45f_full.jpg");
+    .setFooter("Bot created by: curpha", "https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/be/bed810f8bebd7be235b8f7176e3870de1006a6e5_full.jpg");
 
 module.exports = {
     name: 'leave',

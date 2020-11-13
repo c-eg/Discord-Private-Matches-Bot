@@ -14,28 +14,28 @@ const embedMessageStartedQueue = new Discord.MessageEmbed()
     .setTitle('Private Matches!')
     .setColor("#b10000")
     .addField("A queue has started!", "filler")
-    .setFooter("Bot created by: curpha (c-eg)", "https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/avatars/59/595a3684e667dc05e9d0d7e76efa8bb33b43a45f_full.jpg");
+    .setFooter("Bot created by: curpha", "https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/be/bed810f8bebd7be235b8f7176e3870de1006a6e5_full.jpg");
 
 const embedMessageJoinedQueue = new Discord.MessageEmbed()
     .setTitle('Private Matches!')
     .setColor("#b10000")
     .addField("User Joined!", "filler")
     .addField("Users in Queue: ", "filler")
-    .setFooter("Bot created by: curpha (c-eg)", "https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/avatars/59/595a3684e667dc05e9d0d7e76efa8bb33b43a45f_full.jpg");
+    .setFooter("Bot created by: curpha", "https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/be/bed810f8bebd7be235b8f7176e3870de1006a6e5_full.jpg");
 
 const embedMessageCaptains = new Discord.MessageEmbed()
     .setTitle("Captains Selected!")
     .setColor("#b10000")
     .addField("Team 1 Captain", "filler")
     .addField("Team 2 Captain", "filler")
-    .setFooter("Bot created by: curpha (c-eg)", "https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/avatars/59/595a3684e667dc05e9d0d7e76efa8bb33b43a45f_full.jpg");
+    .setFooter("Bot created by: curpha", "https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/be/bed810f8bebd7be235b8f7176e3870de1006a6e5_full.jpg");
 
 const embedMessageTeams = new Discord.MessageEmbed()
     .setTitle("Match Created!")
     .setColor("#b10000")
     .addField("Team 1", "filler")
     .addField("Team 2", "filler")
-    .setFooter("Bot created by: curpha (c-eg)", "https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/avatars/59/595a3684e667dc05e9d0d7e76efa8bb33b43a45f_full.jpg");
+    .setFooter("Bot created by: curpha", "https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/be/bed810f8bebd7be235b8f7176e3870de1006a6e5_full.jpg");
 
 module.exports = {
     name: 'queue',
@@ -226,12 +226,13 @@ function captainsMethod(messageFirst)
 
     messageFirst.channel.send(embedMessageCaptains);
 
-    let msg = "Please pick a player to be on your team, type the number corresponding to the player e.g. `2`\n";
+    const captainVotePickMessage = "Please pick a player to be on your team, type the number corresponding to the player e.g. `2`\n";
+    let messageToSend = captainVotePickMessage;
 
     for (let i = 2; i < inQueue.users.length; i++)
     {
         notInTeam.push(inQueue.users[i]);
-        msg += i - 1 + ") " + inQueue.users[i].discordUser.toString() + "\n";
+        messageToSend += i - 1 + ") " + inQueue.users[i].discordUser.toString() + "\n";
     }
 
     let firstPick;
@@ -248,7 +249,7 @@ function captainsMethod(messageFirst)
         secondPick = teamTwo[0];
     }
 
-    firstPick.send(msg)
+    firstPick.send(messageToSend)
         .then((message) =>
         {
             const filter = m => 1 === 1;
@@ -257,101 +258,89 @@ function captainsMethod(messageFirst)
             message.channel.awaitMessages(filter, { max: 1 })
                 .then((collected) =>
                 {
-                    let i;
+                    let index;
 
-                    if (collected.first().content === '1')
+                    for (let i = 1; i < 5; i++)
                     {
-                        i = 1;
-                    }
-                    else if (collected.first().content === '2')
-                    {
-                        i = 2;
-                    }
-                    else if (collected.first().content === '3')
-                    {
-                        i = 3;
-                    }
-                    else if (collected.first().content === '4')
-                    {
-                        i = 4;
+                        if (collected.first().content === i.toString())
+                        {
+                            index = i;
+                            break;
+                        }
                     }
 
                     if (firstPick === teamOne[0])
-                        teamOne.push(notInTeam.splice(i - 1, 1)[0].discordUser);
+                        teamOne.push(notInTeam.splice(index - 1, 1)[0].discordUser);
                     else
-                        teamTwo.push(notInTeam.splice(i - 1, 1)[0].discordUser);
+                        teamTwo.push(notInTeam.splice(index - 1, 1)[0].discordUser);
                 })
                 .then(() =>
                 {
-                    let a = "Please pick a player to be on your team, type the number corresponding to the player e.g. `2`\n";
+                    let messageToSend = captainVotePickMessage;
 
                     for (let i = 0; i < notInTeam.length; i++)
                     {
-                        a += i + 1 + ") " + notInTeam[i].discordUser.toString() + "\n";
+                        messageToSend += i + 1 + ") " + notInTeam[i].discordUser.toString() + "\n";
                     }
 
-                    secondPick.send(a)
+                    secondPick.send(messageToSend)
                         .then((message) =>
                         {
                             // get second picks choice 1
                             message.channel.awaitMessages(filter, { max: 1 })
                                 .then((collected) =>
                                 {
-                                    let i;
+                                    let index;
 
-                                    if (collected.first().content === '1')
+                                    for (let i = 1; i < 4; i++)
                                     {
-                                        i = 1;
-                                    }
-                                    else if (collected.first().content === '2')
-                                    {
-                                        i = 2;
-                                    }
-                                    else if (collected.first().content === '3')
-                                    {
-                                        i = 3;
+                                        if (collected.first().content === i.toString())
+                                        {
+                                            index = i;
+                                            break;
+                                        }
                                     }
 
                                     if (secondPick === teamOne[0])
-                                        teamOne.push(notInTeam.splice(i - 1, 1)[0].discordUser);
+                                        teamOne.push(notInTeam.splice(index - 1, 1)[0].discordUser);
                                     else
-                                        teamTwo.push(notInTeam.splice(i - 1, 1)[0].discordUser);
+                                        teamTwo.push(notInTeam.splice(index - 1, 1)[0].discordUser);
                                 })
                                 .then(() =>
                                 {
-                                    let a = "Please pick a player to be on your team, type the number corresponding to the player e.g. `2`\n";
+                                    let messageToSend = captainVotePickMessage;
 
                                     for (let i = 0; i < notInTeam.length; i++)
                                     {
-                                        a += i + 1 + ") " + notInTeam[i].discordUser.toString() + "\n";
+                                        messageToSend += i + 1 + ") " + notInTeam[i].discordUser.toString() + "\n";
                                     }
 
-                                    secondPick.send(a)
+                                    secondPick.send(messageToSend)
                                         .then((message) =>
                                         {
                                             // get first picks choice 2
                                             message.channel.awaitMessages(filter, { max: 1 })
                                                 .then((collected) =>
                                                 {
-                                                    let i;
+                                                    let index;
 
-                                                    if (collected.first().content === '1')
+                                                    for (let i = 1; i < 3; i++)
                                                     {
-                                                        i = 1;
-                                                    }
-                                                    else if (collected.first().content === '2')
-                                                    {
-                                                        i = 2;
+                                                        if (collected.first().content === i.toString())
+                                                        {
+                                                            index = i;
+                                                            break;
+                                                        }
                                                     }
 
                                                     if (secondPick === teamOne[0])
                                                     {
-                                                        teamOne.push(notInTeam.splice(i - 1, 1)[0].discordUser);
+                                                        teamOne.push(notInTeam.splice(index - 1, 1)[0].discordUser);
                                                         teamTwo.push(notInTeam.shift().discordUser);
                                                     }
                                                     else
                                                     {
-                                                        teamTwo.push(notInTeam.splice(i - 1, 1)[0].discordUser);
+                                                        teamTwo.push(notInTeam.splice(index - 1, 1)[0].discordUser);
                                                         teamOne.push(notInTeam.shift().discordUser);
                                                     }
                                                 })
